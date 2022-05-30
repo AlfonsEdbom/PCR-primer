@@ -9,12 +9,12 @@ from Candidate_Primers import Candidate_Primers
 from Primer_Pairs import Primer_Pairs
 
 
-
 def get_config(config_file: str) -> dict:
     with open(config_file, "r") as c:
         config = json.load(c)
 
     return config
+
 
 def get_logger(log_file: str):
     logger = logging.getLogger(__name__)
@@ -35,8 +35,9 @@ def get_logger(log_file: str):
 
     return logger
 
+
 def main():
-    start_time = time.monotonic()  # Start timer for program
+    start_time = time.time()  # Start timer for program
 
     # Load config settings from config.json and initiate logger
     config = get_config("config.json")
@@ -51,38 +52,47 @@ def main():
     GC_window = config["settings"]["GC_window"]
 
     # DNA-object
-    genome_DNA = Fasta_DNA(config["files"]["SARS"])
+    genome_DNA = Fasta_DNA(config["files"]["T4"], 150000)
 
+    logger.debug(f"DNA loaded, length of genome: {len(genome_DNA.reverse_strand)}: {time.time() - start_time}")
 
     # Build trie
     t = genome_DNA.build_primer_Trie(primer_length)
 
-    logger.debug(f"The Trie contains {len(t.query(''))} primers!")
-    logger.debug(f"Primer Trie built successfully: {timedelta(seconds=time.monotonic() - start_time)}")
+    logger.debug(f"Primer Trie built, contains {len(t.query(''))} primers: {time.time() - start_time}")
 
     # Remove bad primers
     candidate_primers = Candidate_Primers(genome_DNA)  # initiate filter object
-
     candidate_primers.filter_GC_content(GC_window, GC_min, GC_max)  # remove windows with too high GC-content
+    logger.debug(f"GC content sliding window done: {time.time() - start_time}")
 
     candidate_primers.apply_filters(primer_length, T_min, T_max)  # Apply the rest of the filteres
+    logger.debug(f"Most filters applied, primers left {len(candidate_primers.forward_primers)+len(candidate_primers.reverse_primers)}: {time.time() - start_time}")
+
     candidate_primers.remove_non_unique(t)
+    logger.debug(f"Non unique primers removed {len(candidate_primers.forward_primers)+len(candidate_primers.reverse_primers)}: {time.time() - start_time}")
+
     candidate_primers.remove_low_complexity_primers()
+    logger.debug(f"Low complexity primers removed, primers left {len(candidate_primers.forward_primers)+len(candidate_primers.reverse_primers)}: {time.time() - start_time}")
 
     candidate_primers.remove_similar(t, deltaT)  # Remove primers with too low deltaT
+    logger.debug(f"DeltaT filter, primers left {len(candidate_primers.forward_primers)+len(candidate_primers.reverse_primers)}: {time.time() - start_time}")
 
     # Create primer pairs
     PPs = Primer_Pairs(genome_DNA, candidate_primers.forward_primers, candidate_primers.reverse_primers)
     PPs.find_primer_pairs(300, 1500, is_circular=True)
+    logger.debug(f"All primer pairs found, number of primer pairs {len(PPs.primer_pairs)}: {time.time() - start_time}")
+
     PPs.filter_primer_pairs(GC_min, GC_max)
+    logger.debug(f"Primer pair filtered, number of primer pairs {len(PPs.primer_pairs)}: {time.time() - start_time}")
 
     # Cut with restriction enzymes
     PPs.restriction_enzymes_cut()
+    logger.debug(f"restriction sites for primer pairs: {time.time() - start_time}")
 
     primer_pairs = PPs.get_primer_pairs(3)
 
-
-    print(f"The program took {timedelta(seconds=time.monotonic() - start_time)} to execute)")
+    logger.info(f"The program took {time.time() - start_time} to execute)")
 
 
 if __name__ == '__main__':
