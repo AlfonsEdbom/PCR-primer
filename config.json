@@ -3,7 +3,8 @@
     "P2": "C:\\Users\\alfon\\Documents\\Skolprojekt\\PCR-primer\\sequences\\Enterobacteria-phage-P2-NC_001895-complete-genome.fasta",
     "SARS": "C:\\Users\\alfon\\Documents\\Skolprojekt\\PCR-primer\\sequences\\SARS-CoV-2-isolate-Wuhan-Hu-1-complete-genome.fasta",
     "T4": "C:\\Users\\alfon\\Documents\\Skolprojekt\\PCR-primer\\sequences\\NC_000866-Enterobact-phage-T4-complete-genome.fasta",
-    "test": "C:\\Users\\alfon\\Documents\\Skolprojekt\\PCR-primer\\sequences\\test.fasta"},
+    "test": "C:\\Users\\alfon\\Documents\\Skolprojekt\\PCR-primer\\sequences\\test.fasta",
+    "ecoli":  "C:\\\\Users\\\\alfon\\\\Documents\\\\Skolprojekt\\\\PCR-primer\\\\sequences\\\\ecoli.fasta"},
   "settings": {
     "GC_window": 30,
     "length": 20,

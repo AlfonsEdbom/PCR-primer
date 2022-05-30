@@ -173,7 +173,6 @@ class Candidate_Primers:
     def remove_similar(self, trie: Trie, max_mismatches: int):
         """
         Removes primers from self.candidate_primers that have too binding temp.
-
         """
 
         tmp_forward = []

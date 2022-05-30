@@ -8,9 +8,13 @@ class Fasta_DNA:
     Reads Fasta file and stores the forward and reverse strands of the genome sequence
     """
 
-    def __init__(self, fasta_file: str) -> None:
+    def __init__(self, fasta_file: str, length) -> None:
+
+        self.length = length
         self.forward_strand = self.read_fasta(fasta_file)
         self.reverse_strand = self.calculate_reverse_DNA(self.forward_strand)
+
+
 
     def read_fasta(self, file_path: str) -> str:
         """
@@ -25,7 +29,7 @@ class Fasta_DNA:
         for i in range(1, len(content)):
             self.forward_strand += content[i].strip()
 
-        return self.forward_strand
+        return self.forward_strand[:self.length]
 
     def calculate_reverse_DNA(self, DNA_string: str) -> str:
         """
